@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Rotación de ONs | Revolución Financiera</title>
+    <link rel="icon" href="revfin_logo.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #FAFBFC;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #F1F3F5;
+            --text-primary: #1A1D23;
+            --text-secondary: #5A6270;
+            --text-muted: #8C939E;
+            --accent: #E63B2E;
+            --accent-light: #FEF0EF;
+            --accent-dark: #C4291E;
+            --border: #E5E8EB;
+            --border-light: #F0F2F4;
+            --success: #22C55E;
+            --success-light: #F0FDF4;
+            --warning: #F59E0B;
+            --warning-light: #FFFBEB;
+            --danger: #EF4444;
+            --danger-light: #FEF2F2;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* HEADER */
+        .header {
+            background: rgba(255,255,255,0.92);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .header-brand img { width: 40px; height: 40px; object-fit: contain; border-radius: 8px; }
+        .header-brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+        .header-brand-name { font-weight: 700; font-size: 16px; }
+        .header-brand-sub { font-size: 12px; color: var(--text-muted); }
+        .header-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, #2D3340 0%, #434D5E 100%);
+            padding: 56px 24px 48px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(ellipse at 30% 50%, rgba(230, 59, 46, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .hero h1 {
+            font-size: clamp(26px, 4.5vw, 38px);
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 12px;
+            position: relative;
+            letter-spacing: -0.5px;
+        }
+        .hero h1 span { color: var(--accent); }
+        .hero p {
+            font-size: clamp(15px, 2.5vw, 18px);
+            color: rgba(255,255,255,0.6);
+            max-width: 640px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* MAIN */
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: 28px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-sm);
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        /* INPUTS */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 16px;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .input-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(230, 59, 46, 0.1);
+        }
+        .input-group input::placeholder { color: var(--text-muted); }
+        .input-suffix {
+            position: relative;
+        }
+        .input-suffix input { padding-right: 45px; }
+        .input-suffix .suffix {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* DIFFERENTIAL DISPLAY */
+        .diff-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .diff-item {
+            text-align: center;
+        }
+        .diff-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .diff-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .diff-arrow {
+            font-size: 28px;
+            color: var(--text-muted);
+        }
+        .diff-positive { color: var(--success); }
+        .diff-negative { color: var(--danger); }
+
+        /* RESULTS TABLE */
+        .results-table-wrap {
+            overflow-x: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .results-table thead { background: var(--bg-tertiary); }
+        .results-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .results-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            white-space: nowrap;
+        }
+        .results-table tbody tr { transition: background 0.15s; }
+        .results-table tbody tr:hover { background: var(--bg-tertiary); }
+        .results-table tbody tr:last-child td { border-bottom: none; }
+        .broker-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .broker-cell img {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            object-fit: contain;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border);
+            padding: 3px;
+        }
+        .broker-cell span { font-weight: 600; }
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px; height: 24px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .rank-other { background: var(--bg-tertiary); color: var(--text-muted); }
+        .cost-highlight {
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+        }
+        .cost-low { color: #16A34A; }
+        .cost-mid { color: #D97706; }
+        .cost-high { color: #DC2626; }
+        .months-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .months-good { background: var(--success-light); color: #16A34A; }
+        .months-ok { background: var(--warning-light); color: #D97706; }
+        .months-bad { background: var(--danger-light); color: #DC2626; }
+
+        /* CHART */
+        .chart-container {
+            position: relative;
+            height: 380px;
+            margin-bottom: 8px;
+        }
+
+        /* EXPLANATION */
+        .explanation {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            border-left: 3px solid var(--accent);
+        }
+        .explanation h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .explanation p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* DISCLAIMER */
+        .disclaimer {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: 20px 24px;
+            margin-top: 36px;
+            border-left: 3px solid var(--text-muted);
+        }
+        .disclaimer h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .disclaimer p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* NO DATA */
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .no-data-icon { font-size: 40px; margin-bottom: 12px; }
+
+        /* FOOTER */
+        .footer {
+            background: #3D4452;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            padding: 28px 24px;
+            font-size: 13px;
+        }
+        .footer a { color: var(--accent); text-decoration: none; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .header-title { display: none; }
+            .chart-container { height: 300px; }
+            .hero { padding: 40px 20px 36px; }
+            .main { padding: 24px 16px 60px; }
+            .card { padding: 20px; }
+            .diff-display { gap: 12px; padding: 16px; }
+            .diff-value { font-size: 22px; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeInUp 0.4s ease-out forwards; }
+    </style>
+</head>
+<body>
+
+<!-- SIMULATOR NAV -->
+<div style="background:#3D4452;padding:10px 0;text-align:center;font-size:13px;">
+    <div style="max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
+        <span style="color:rgba(255,255,255,0.5);font-weight:600;">Más simuladores:</span>
+        <a href="https://rfinanciera.github.io/Comisiones.brokers/" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:5px 14px;border-radius:100px;text-decoration:none;font-weight:500;font-size:12px;">💼 Comisiones Brokers</a>
+        <a href="https://rfinanciera.github.io/Comisiones.brokers/switch_on.html" style="background:var(--accent);color:white;padding:5px 14px;border-radius:100px;text-decoration:none;font-weight:600;font-size:12px;">🔄 Rotación de ONs</a>
+        <a href="https://rfinanciera.github.io/lecap.vender.antes/" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:5px 14px;border-radius:100px;text-decoration:none;font-weight:500;font-size:12px;">📊 ¿Cuándo vender LECAPs?</a>
+        <a href="https://rfinanciera.github.io/simulador.carry.trade/" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:5px 14px;border-radius:100px;text-decoration:none;font-weight:500;font-size:12px;">💱 Carry Trade</a>
+    </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="header-inner">
+        <a class="header-brand" href="#">
+            <img src="revfin_logo.png" alt="Revolución Financiera">
+            <div class="header-brand-text">
+                <span class="header-brand-name">Revolución Financiera</span>
+                <span class="header-brand-sub">Finanzas Personales · Inversiones · Economía</span>
+            </div>
+        </a>
+        <span class="header-title">Simulador Rotación ONs 2026</span>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <h1>¿Conviene hacer la <span>rotación</span> de ON?</h1>
+    <p>Calculá cuánto te cuestan las comisiones al cambiar de Obligación Negociable y cuánto tiempo necesitás para recuperar ese costo con el diferencial de TIR.</p>
+</section>
+
+<!-- MAIN -->
+<main class="main">
+
+    <!-- Explanation -->
+    <div class="explanation animate-in">
+        <h4>💡 ¿Cómo funciona?</h4>
+        <p>Cuando vendés una ON para comprar otra con mejor TIR, pagás comisiones de venta y de compra (ida y vuelta). Ese costo "se come" parte de tu ganancia. Este simulador te muestra cuántos meses necesitás quedarte con la nueva ON para que el diferencial de TIR compense las comisiones de la rotación en cada broker.</p>
+    </div>
+
+    <!-- Simulator -->
+    <div class="card animate-in">
+        <div class="card-title">📊 Simulador de Rotación</div>
+        <div class="card-subtitle">Ingresá los datos de tu operación</div>
+
+        <div class="input-grid">
+            <div class="input-group">
+                <label>Monto invertido (ARS o USD)</label>
+                <input type="text" id="montoInput" placeholder="Ej: 10.000.000" oninput="formatMonto(this); calcular();">
+            </div>
+            <div class="input-group">
+                <label>TIR de la ON actual (%)</label>
+                <div class="input-suffix">
+                    <input type="number" id="tirActual" placeholder="Ej: 6.5" step="0.1" min="0" max="100" oninput="calcular()">
+                    <span class="suffix">%</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>TIR de la ON nueva (%)</label>
+                <div class="input-suffix">
+                    <input type="number" id="tirNueva" placeholder="Ej: 7.0" step="0.1" min="0" max="100" oninput="calcular()">
+                    <span class="suffix">%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Differential display -->
+        <div class="diff-display" id="diffDisplay" style="display:none;">
+            <div class="diff-item">
+                <div class="diff-label">TIR Actual</div>
+                <div class="diff-value" id="diffActual">—</div>
+            </div>
+            <div class="diff-arrow">→</div>
+            <div class="diff-item">
+                <div class="diff-label">TIR Nueva</div>
+                <div class="diff-value" id="diffNueva">—</div>
+            </div>
+            <div class="diff-arrow">=</div>
+            <div class="diff-item">
+                <div class="diff-label">Diferencial</div>
+                <div class="diff-value" id="diffDelta">—</div>
+            </div>
+        </div>
+
+        <div id="resultsArea">
+            <div class="no-data">
+                <div class="no-data-icon">🔄</div>
+                <p>Completá los datos para ver cuánto te cuesta la rotación en cada broker</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card animate-in" id="chartCard" style="display:none;">
+        <div class="card-title">⏱️ Meses para recuperar el costo de la rotación</div>
+        <div class="card-subtitle">Tiempo necesario para que el diferencial de TIR compense las comisiones</div>
+        <div class="chart-container">
+            <canvas id="switchChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+        <h4>⚠️ Aviso Legal</h4>
+        <p>Este simulador es de carácter informativo y no constituye asesoramiento financiero. El cálculo asume que el diferencial de TIR se mantiene constante y no contempla variaciones de precio de mercado, riesgo crediticio, ni otros factores. Las comisiones corresponden a las tarifas publicadas por cada broker para ONs (personas humanas, operatoria online) vigentes a marzo 2026. Se incluyen derechos de mercado BYMA (0,01%) e IVA (21%). ONs están exentas de IVA sobre comisiones. Verificá siempre las comisiones actualizadas. Herramienta creada por Revolución Financiera.</p>
+    </div>
+
+</main>
+
+<!-- YOUTUBE CTA -->
+<div style="max-width:1100px;margin:0 auto;padding:0 24px 40px;">
+    <div style="background:linear-gradient(135deg,#FAFBFC,#F1F3F5);border-radius:16px;padding:32px;text-align:center;border:1px solid var(--border);">
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;">
+            <img src="revfin_logo.png" alt="Revolución Financiera" style="width:48px;height:48px;border-radius:10px;">
+        </div>
+        <p style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">¿Querés más videos sobre inversiones y finanzas personales? 👇</p>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px;">www.youtube.com/@Revolucion.Financiera</p>
+        <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
+            <a href="https://www.youtube.com/@Revolucion.Financiera" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#FF0000;color:white;padding:14px 28px;border-radius:100px;text-decoration:none;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(255,0,0,0.25);">▶ Suscribite a Revolución Financiera</a>
+            <a href="https://www.instagram.com/revolucionfinancieraok/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#833AB4,#FD1D1D,#F77737);color:white;padding:14px 28px;border-radius:100px;text-decoration:none;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(131,58,180,0.25);">📷 Seguinos en Instagram</a>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <p>Hecho con ❤️ por <a href="https://youtube.com/@Revolucion.Financiera" target="_blank">Revolución Financiera</a></p>
+</footer>
+
+<script>
+// =========================================
+// DATA
+// =========================================
+const BROKERS = {
+    cocos:      { name: "Cocos Capital", logo: "cocos_logo.png",          rate: 0.45 },
+    iol:        { name: "IOL",           logo: "iol_logo.png",            rate: 0.50 },
+    balanz:     { name: "Balanz",        logo: "balanz_logo.webp",        rate: 0.50 },
+    bullmarket: { name: "Bull Market",   logo: "bull_market_logo.jpg",    rate: 0.50 },
+    ppi:        { name: "PPI",           logo: "ppi_logo.jpeg",           rate: 0.60 },
+    rava:       { name: "Rava Bursátil", logo: "rava_logo.jpg",           rate: 0.80 },
+    vetacap:    { name: "Veta Cap",      logo: "veta_cap_logo.png",       rate: 0.15 },
+    ecovalores: { name: "Eco Valores",   logo: "eco_valores_logo.png",    rate: 0.49 },
+};
+
+const DM_RATE = 0.01;  // Derechos de mercado BYMA para ONs: 0,01%
+// ONs están exentas de IVA sobre comisiones y derechos de mercado
+
+let chart = null;
+
+// =========================================
+// FORMAT
+// =========================================
+function formatMonto(input) {
+    let val = input.value.replace(/\D/g, '');
+    if (val) input.value = parseInt(val).toLocaleString('es-AR');
+}
+
+function parseMonto() {
+    const raw = document.getElementById('montoInput').value.replace(/\./g, '').replace(/,/g, '');
+    return parseInt(raw) || 0;
+}
+
+function formatNum(n) {
+    return Math.round(n).toLocaleString('es-AR');
+}
+
+// =========================================
+// CALCULATE
+// =========================================
+function calcular() {
+    const monto = parseMonto();
+    const tirActual = parseFloat(document.getElementById('tirActual').value);
+    const tirNueva = parseFloat(document.getElementById('tirNueva').value);
+    const area = document.getElementById('resultsArea');
+    const diffDisplay = document.getElementById('diffDisplay');
+    const chartCard = document.getElementById('chartCard');
+
+    if (!monto || isNaN(tirActual) || isNaN(tirNueva)) {
+        area.innerHTML = `<div class="no-data"><div class="no-data-icon">🔄</div><p>Completá los datos para ver cuánto te cuesta la rotación en cada broker</p></div>`;
+        diffDisplay.style.display = 'none';
+        chartCard.style.display = 'none';
+        return;
+    }
+
+    const diffTIR = tirNueva - tirActual;
+    const gananciaAnual = monto * (diffTIR / 100);
+
+    // Show differential
+    diffDisplay.style.display = 'flex';
+    document.getElementById('diffActual').textContent = tirActual.toFixed(2) + '%';
+    document.getElementById('diffNueva').textContent = tirNueva.toFixed(2) + '%';
+    const diffEl = document.getElementById('diffDelta');
+    diffEl.textContent = (diffTIR >= 0 ? '+' : '') + diffTIR.toFixed(2) + '%';
+    diffEl.className = 'diff-value ' + (diffTIR > 0 ? 'diff-positive' : diffTIR < 0 ? 'diff-negative' : '');
+
+    // Calculate per broker
+    let results = [];
+    for (const [id, broker] of Object.entries(BROKERS)) {
+        // Ida y vuelta: venta ON actual + compra ON nueva
+        const comisionVenta = monto * (broker.rate / 100);
+        const comisionCompra = monto * (broker.rate / 100);
+        const dmVenta = monto * (DM_RATE / 100);
+        const dmCompra = monto * (DM_RATE / 100);
+        // ONs exentas de IVA
+        const costoTotal = comisionVenta + comisionCompra + dmVenta + dmCompra;
+        
+        // Meses para recuperar
+        let mesesRecupero;
+        if (diffTIR <= 0) {
+            mesesRecupero = Infinity;
+        } else {
+            const gananciaMensual = gananciaAnual / 12;
+            mesesRecupero = costoTotal / gananciaMensual;
+        }
+
+        results.push({
+            id,
+            name: broker.name,
+            logo: broker.logo,
+            rate: broker.rate,
+            comisionVenta,
+            comisionCompra,
+            dmTotal: dmVenta + dmCompra,
+            costoTotal,
+            mesesRecupero,
+            gananciaAnual,
+        });
+    }
+
+    results.sort((a, b) => a.costoTotal - b.costoTotal);
+
+    // Build table
+    let html = `<div class="results-table-wrap"><table class="results-table">
+        <thead><tr>
+            <th>#</th>
+            <th>Broker</th>
+            <th>Comisión (%)</th>
+            <th>Costo Compra/Venta</th>
+            <th>Der. Mercado</th>
+            <th>Costo Total</th>
+            <th>Recupero</th>
+        </tr></thead><tbody>`;
+
+    results.forEach((r, i) => {
+        const rankDisplay = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span class="rank-badge rank-other">${i + 1}</span>`;
+        
+        // Determine color based on months to recover (same color for cost and months)
+        let colorClass, monthsDisplay;
+        if (r.mesesRecupero === Infinity) {
+            colorClass = 'cost-high';
+            monthsDisplay = '<span class="months-badge months-bad">No recupera ⛔</span>';
+        } else if (r.mesesRecupero <= 3) {
+            colorClass = 'cost-low';
+            monthsDisplay = `<span class="months-badge months-good">${r.mesesRecupero.toFixed(1)} meses ✅</span>`;
+        } else if (r.mesesRecupero <= 12) {
+            colorClass = 'cost-mid';
+            monthsDisplay = `<span class="months-badge months-ok">${r.mesesRecupero.toFixed(1)} meses ⚠️</span>`;
+        } else {
+            colorClass = 'cost-high';
+            monthsDisplay = `<span class="months-badge months-bad">${r.mesesRecupero.toFixed(1)} meses ⛔</span>`;
+        }
+
+        html += `<tr>
+            <td style="font-size:20px;text-align:center;">${rankDisplay}</td>
+            <td><div class="broker-cell"><img src="${r.logo}" alt="${r.name}"><span>${r.name}</span></div></td>
+            <td>${r.rate.toFixed(2)}% (x2)</td>
+            <td>$${formatNum(r.comisionVenta + r.comisionCompra)}</td>
+            <td>$${formatNum(r.dmTotal)}</td>
+            <td><span class="cost-highlight ${colorClass}">$${formatNum(r.costoTotal)}</span></td>
+            <td>${monthsDisplay}</td>
+        </tr>`;
+    });
+
+    html += '</tbody></table></div>';
+
+    // Summary
+    if (diffTIR > 0) {
+        const best = results[0];
+        const worst = results[results.length - 1];
+        html += `<div style="margin-top:16px;padding:14px 18px;background:var(--accent-light);border-radius:var(--radius-sm);font-size:14px;color:var(--accent-dark);">
+            <strong>💡 Resumen:</strong> Con un diferencial de ${diffTIR.toFixed(2)}%, ganás <strong>$${formatNum(gananciaAnual)}/año</strong> extra. 
+            En <strong>${best.name}</strong> recuperás el costo en <strong>${best.mesesRecupero.toFixed(1)} meses</strong>, 
+            mientras que en ${worst.name} tardás <strong>${worst.mesesRecupero.toFixed(1)} meses</strong>.
+        </div>`;
+    } else if (diffTIR === 0) {
+        html += `<div style="margin-top:16px;padding:14px 18px;background:var(--warning-light);border-radius:var(--radius-sm);font-size:14px;color:#92400E;">
+            <strong>⚠️ Atención:</strong> Las TIRs son iguales. La rotación solo genera costos sin ganancia adicional.
+        </div>`;
+    } else {
+        html += `<div style="margin-top:16px;padding:14px 18px;background:var(--danger-light);border-radius:var(--radius-sm);font-size:14px;color:#991B1B;">
+            <strong>⛔ Cuidado:</strong> La TIR nueva es menor que la actual. La rotación te haría perder ${Math.abs(diffTIR).toFixed(2)}% anual de rendimiento, además de las comisiones.
+        </div>`;
+    }
+
+    area.innerHTML = html;
+
+    // Chart
+    if (diffTIR > 0) {
+        chartCard.style.display = '';
+        renderChart(results);
+    } else {
+        chartCard.style.display = 'none';
+    }
+}
+
+// =========================================
+// CHART
+// =========================================
+function renderChart(results) {
+    if (chart) chart.destroy();
+
+    const labels = results.map(r => r.name);
+    const data = results.map(r => r.mesesRecupero === Infinity ? 0 : parseFloat(r.mesesRecupero.toFixed(1)));
+    const colors = results.map((r, i) => {
+        if (r.mesesRecupero <= 3) return '#22C55E';
+        if (r.mesesRecupero <= 12) return '#F59E0B';
+        return '#EF4444';
+    });
+
+    const ctx = document.getElementById('switchChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'bar',
+        plugins: [ChartDataLabels],
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderRadius: 6,
+                borderSkipped: false,
+                barPercentage: 0.65,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: { right: 80 }
+            },
+            plugins: {
+                legend: { display: false },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'right',
+                    offset: 6,
+                    font: { family: 'Space Mono', size: 12, weight: 700 },
+                    color: '#1A1D23',
+                    formatter: function(value) {
+                        if (value === 0) return 'N/A';
+                        return value.toFixed(1) + ' meses';
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.raw === 0 ? 'No recupera' : ctx.raw.toFixed(1) + ' meses';
+                        }
+                    },
+                    backgroundColor: '#1A1D23',
+                    padding: 12,
+                    cornerRadius: 8,
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: '#F1F3F5', drawBorder: false },
+                    ticks: {
+                        font: { family: 'Space Mono', size: 11 },
+                        color: '#8C939E',
+                        callback: v => v + ' m'
+                    }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { family: 'DM Sans', size: 13, weight: 500 },
+                        color: '#5A6270',
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+
+</body>
+</html>
