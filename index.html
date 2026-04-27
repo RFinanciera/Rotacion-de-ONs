@@ -621,10 +621,9 @@ function calcular() {
             <th>#</th>
             <th>Broker</th>
             <th>Comisión (%)</th>
-            <th>Costo Venta</th>
-            <th>Costo Compra</th>
+            <th>Costo Compra/Venta</th>
             <th>Der. Mercado</th>
-            <th>Costo Total Rotación</th>
+            <th>Costo Total</th>
             <th>Recupero</th>
         </tr></thead><tbody>`;
 
@@ -651,8 +650,7 @@ function calcular() {
             <td style="font-size:20px;text-align:center;">${rankDisplay}</td>
             <td><div class="broker-cell"><img src="${r.logo}" alt="${r.name}"><span>${r.name}</span></div></td>
             <td>${r.rate.toFixed(2)}% (x2)</td>
-            <td>$${formatNum(r.comisionVenta)}</td>
-            <td>$${formatNum(r.comisionCompra)}</td>
+            <td>$${formatNum(r.comisionVenta + r.comisionCompra)}</td>
             <td>$${formatNum(r.dmTotal)}</td>
             <td><span class="cost-highlight ${colorClass}">$${formatNum(r.costoTotal)}</span></td>
             <td>${monthsDisplay}</td>
